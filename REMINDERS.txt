@@ -1,0 +1,176 @@
+============================================================
+  FTSEHybrid AI -- REMINDERS & GO-LIVE CHECKLIST
+  FTSE 100 Spread Betting via IG Markets
+============================================================
+
+BEFORE GOING LIVE -- COMPLETE THIS CHECKLIST
+---------------------------------------------
+
+[ ] 1. CREATE .env FILE in C:\Users\nicks\Desktop\FTSEHybridAI\
+        Required keys:
+          IG_USERNAME=your_ig_username
+          IG_PASSWORD=your_ig_password
+          IG_API_KEY=your_ig_api_key
+          IG_ACC_TYPE=DEMO          # change to LIVE when ready
+          IG_ACC_NUMBER=your_account_number
+          ANTHROPIC_API_KEY=your_anthropic_key
+          PUSHOVER_USER_KEY=your_pushover_user
+          PUSHOVER_API_TOKEN=your_pushover_token
+
+        NOTE: Pushover keys can be copied from TideTraderAI .env
+        NOTE: IG credentials -- demo first, live later
+
+[ ] 2. INSTALL DEPENDENCIES
+        pip install -r requirements_ftsehybrid.txt
+        Confirm trading-ig installs: pip show trading-ig
+
+[ ] 3. PAPER TRADE FIRST
+        main_ftsehybrid.py line 1: PAPER_TRADING_MODE = True
+        Run for minimum 2 weeks on demo before live
+        Target: replicate backtest results (57.3% WR, +150% annual)
+
+[ ] 4. CONFIRM PAPER TRADING WORKS
+        - Run main_ftsehybrid.py
+        - Check logs/ftse_trades.csv populates
+        - Check logs/ftse_summary.txt updates
+        - Confirm dashboard shows at http://localhost:5042
+        - Watch log output for signal generation
+
+[ ] 5. IG DEMO ACCOUNT TEST
+        - Set IG_ACC_TYPE=DEMO in .env
+        - Set PAPER_TRADING_MODE = False in main_ftsehybrid.py
+        - Run one session and confirm IG API round-trip works
+        - Verify orders appear in IG demo platform
+        - Then set PAPER_TRADING_MODE = True again for more paper testing
+
+[ ] 6. BEFORE SWITCHING TO LIVE
+        - Minimum 50 paper trades with positive expectancy
+        - Win rate >= 55% on paper
+        - Kill switch never triggered by bad streak
+        - Daily summary Pushover notifications working
+        - Dashboard loading cleanly at port 5042
+        - Change IG_ACC_TYPE=LIVE and IG_ACC_NUMBER=live_number in .env
+        - Change PAPER_TRADING_MODE = False in main_ftsehybrid.py
+
+
+KEY SETTINGS (DO NOT CHANGE WITHOUT BACKTESTING)
+-------------------------------------------------
+
+Trailing stop:    40 points       (POINTS, not %, not pips)
+Take profit:      200 points      (safety ceiling -- never hit in practice)
+Max risk/trade:   GBP 10.00       (2% of GBP 500 account)
+Stake/point:      GBP 0.25/pt     (= GBP 10 / 40pt stop)
+EPIC:             IX.D.FTSE.CASH.IP
+Spread cost:      1 point per trade
+Force close:      16:20 UK        (hard rule -- no overnight positions EVER)
+Lunch filter:     ON (12:00-13:30 no new entries -- confirmed in backtest)
+GBP/USD filter:   OFF (hurts performance in backtest)
+Sessions:         Morning Prime (08:15-12:00) and Afternoon (13:30-15:30)
+Both directions:  ON (LONG 55.6%, SHORT 59.1% backtest win rates)
+
+
+BACKTEST RESULTS SUMMARY (85 days, 49 trades)
+----------------------------------------------
+
+Best configuration: TS40pt + LunchSKIP + GBPUSDoff
+Win rate:           57.3%  (28 of 49 trades)
+Annualised return:  +150%  (on GBP 500 account)
+Average winner:     +44 points
+Average loser:      -40 points (stopped out at TS)
+Best session:       Afternoon 65% WR
+Morning session:    53% WR
+LONG win rate:      55.6%  (27 trades)
+SHORT win rate:     59.1%  (22 trades)
+200pt TP hit:       NEVER  (trailing stop always exits first)
+
+Full results in: logs/backtest_ftse_results.txt
+                 logs/backtest_ftse_sweep.csv
+
+
+FILE MANIFEST (15 files)
+------------------------
+
+ig_connector.py        -- Excalibur: IG Markets API wrapper
+data_feed_ftse.py      -- Merlin: Indicators + data feed (3 timeframes)
+pre_checks_ftse.py     -- Lancelot: Pre-trade safety checks
+calendar_ftse.py       -- Guinevere: UK economic calendar (BoE hard blocks)
+strategy_ftse.py       -- FTSETrade dataclass, sizing, force close
+paper_trader_ftse.py   -- Stanley: Paper trading + CSV logging
+performance_ftse.py    -- Morgan: Performance analytics + AI confidence
+notifier_ftse.py       -- Percival: Pushover notifications
+watchdog_ftse.py       -- Galahad: Process watchdog (restart on crash/freeze)
+agent_brain_ftse.py    -- Arthur: Claude AI decision engine
+main_ftsehybrid.py   -- Main trading loop (Mon-Fri, 08:00-16:30 UK)
+dashboard_ftse.py      -- Flask dashboard (port 5042, gold accent)
+start_ftsehybrid.bat -- Windows launcher
+requirements_ftsehybrid.txt
+REMINDERS.txt          -- This file
+
+
+HOW TO START
+------------
+
+Option A -- Recommended (with watchdog):
+  Double-click start_ftsehybrid.bat, choose option 1
+
+Option B -- Direct:
+  cd C:\Users\nicks\Desktop\FTSEHybridAI
+  python main_ftsehybrid.py
+
+Dashboard (separate terminal):
+  python dashboard_ftse.py
+  Then open http://localhost:5042
+
+
+ARTHURIAN LEGEND TEAM
+----------------------
+
+Arthur     = Claude AI brain      (agent_brain_ftse.py)
+Merlin     = Data & indicators    (data_feed_ftse.py)
+Lancelot   = Pre-check guardian   (pre_checks_ftse.py)
+Excalibur  = IG API interface     (ig_connector.py)
+Guinevere  = Economic calendar    (calendar_ftse.py)
+Morgan     = Performance tracker  (performance_ftse.py)
+Galahad    = Watchdog             (watchdog_ftse.py)
+Percival   = Pushover notifier    (notifier_ftse.py)
+Stanley    = Paper trader/logger  (paper_trader_ftse.py)
+
+
+COMMON ISSUES
+-------------
+
+Q: Arthur keeps saying STAY_OUT even on good setups.
+A: Check Morgan confidence score. If <25, conservative mode is ON (hard rule).
+   Also check kill switch status. After losses, Lancelot enforces cooldown.
+
+Q: No trades for a long time.
+A: Check session phase -- only MORNING_PRIME and AFTERNOON allow entries.
+   Check calendar -- BoE decision days block 30 min either side of 12:00.
+   Check daily SSL cloud direction -- it must match 1h SSL for entry.
+
+Q: IG connection fails.
+A: Check .env credentials. IG API can have session timeouts.
+   ig_connector.py has 60s price caching to reduce API calls.
+   Paper trading mode works without IG connection (yfinance fallback).
+
+Q: Dashboard not loading.
+A: Start dashboard_ftse.py in a separate terminal.
+   Main loop and dashboard are separate processes.
+   Dashboard port 5042 must not be in use.
+
+Q: Force close not happening.
+A: Force close checks every 30 seconds in position monitoring loop.
+   It triggers at 16:20 UK -- Lancelot also blocks new entries at 15:30.
+   Check UK timezone conversion -- pytz must be installed.
+
+
+RISK DISCLAIMER
+---------------
+
+Spread betting involves substantial risk of loss.
+Past backtest performance does not guarantee future results.
+The GBP 500 account size limits max drawdown to tolerable levels.
+Never trade with money you cannot afford to lose.
+Always start in paper trading mode and verify before going live.
+
+============================================================
