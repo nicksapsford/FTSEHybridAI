@@ -171,23 +171,14 @@ def compute_flat_fields(s: dict) -> dict:
         else:
             flat["lancelot_status"] = "BLOCKED"
 
-        # ── Arthur decision ──────────────────────────────────────────────
-        if not consulted:
-            flat["arthur_decision"] = "---"
-        elif in_trade:
-            flat["arthur_decision"] = "HOLD"
+        # ── Arthur decision (Type-1 hybrid: Arthur manages the EXIT only) ──
+        # In a position -> HOLD/EXIT; flat -> Arthur is not consulted (Lancelot handles
+        # entry), so MONITORING -- never "STAY OUT" (which would imply an entry decision).
+        raw = (decision.get("decision") or "").upper() if isinstance(decision, dict) else ""
+        if in_trade:
+            flat["arthur_decision"] = "EXIT" if raw.startswith("EXIT") else "HOLD"
         else:
-            raw = (decision.get("decision") or "").upper() if isinstance(decision, dict) else ""
-            dec_map = {
-                "ENTER_LONG":  "LONG",
-                "ENTER_SHORT": "SHORT",
-                "STAY_OUT":    "STAY OUT",
-                "HOLD":        "HOLD",
-            }
-            if raw.startswith("EXIT"):
-                flat["arthur_decision"] = "STAY OUT"
-            else:
-                flat["arthur_decision"] = dec_map.get(raw, "STAY OUT" if raw else "---")
+            flat["arthur_decision"] = "MONITORING (no position)"
 
         # ── Arthur confidence ────────────────────────────────────────────
         if consulted and isinstance(decision, dict) and decision.get("confidence") is not None:
@@ -1019,6 +1010,13 @@ function renderPage1(d){
 
   var reasoning   = dec.reasoning || 'Waiting for next analysis cycle...';
   var blockReason = (d.pre_checks_reason) || '';
+  // Type-1 hybrid: Arthur manages EXITS only. With no open position he is NOT consulted on
+  // entry, so show a clear MONITORING state rather than a misleading "STAY OUT".
+  if(!hasOpenPosition){
+    decText     = 'MONITORING';
+    reasoning   = 'No open position — Arthur activates on entry to manage exit (HOLD/EXIT).';
+    blockReason = '';
+  }
   var reasonBox = (blockReason && mode === 'pre_checks')
     ? '<div class="block-reason">' + blockReason + '</div>'
     : '<div class="reasoning">' + reasoning + '</div>';
