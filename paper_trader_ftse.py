@@ -240,6 +240,15 @@ class PaperTraderFTSE:
         """Close the current paper trade, update capital, save CSV."""
         if self.current_trade is None:
             return None
+        # stop-fill fidelity (Job 10, 24 Jul 2026, Nick-confirmed 23 Jul):
+        # on a STOP_LOSS exit ONLY, fill at the stop level rather than the
+        # observed price, which may have gapped through the stop between
+        # 30-second monitor checks. Clamp BEFORE pnl is computed downstream.
+        if reason == "STOP_LOSS":
+            if self.current_trade.direction == "LONG":
+                price = max(self.current_trade.stop_loss, price)
+            else:
+                price = min(self.current_trade.stop_loss, price)
         from strategy_ftse import close_trade
         trade = close_trade(self.current_trade, price, reason)
         self.capital_gbp = round(self.capital_gbp + trade.pnl_gbp, 2)
