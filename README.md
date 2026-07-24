@@ -17,19 +17,23 @@ see Gaius Commission 005, 22 Jul 2026).
 ## Architecture
 **ENTRY — Lancelot only (no Arthur):** a trade fires immediately when (1) all
 `pre_checks_ftse` pass, (2) Daily + 1h + 5m SSL all agree a direction, and (3) no
-HARD_BLOCK calendar event is within 60 min. SHORTs also require Morgan ≥ 65. No
-Arthur, no RSI/confidence entry gate.
+HARD_BLOCK calendar event is within 60 min. Fully bidirectional — SHORTs enter on
+the same terms as LONGs (the Morgan SHORT gate was removed 24 Jul 2026). No Arthur,
+no RSI/confidence entry gate, and (Type-1) no Morgan hard-block on entry — Lancelot
+enters regardless of Morgan; Morgan only sharpens Arthur's exit posture.
 
 **EXIT — Arthur only:** once in a trade Arthur is consulted every 5 min and outputs
 **HOLD** or **EXIT** only (never an entry decision). He exits early on a daily-SSL
 flip, deteriorating 5m momentum, extended/reversing RSI, news turning against the
-position, or the approaching close. Morgan confidence sets his exit posture (HIGH =
-more room, VERY LOW = exit on any deterioration). The mechanical 10pt stop / 25pt
-target / Profit Protection Ladder run regardless.
+position, or the approaching close. Morgan confidence sets his exit posture under the
+three-zone model (NORMAL ≥50 = normal room, WARNING 30-49 = tighter, CRITICAL <30 =
+exit early/maximally defensive). The mechanical 10pt stop / 25pt target / Profit
+Protection Ladder run regardless.
 
 ## Parameters
-Stop 10pt · Target 25pt · Spread 3pt · Stake £2/pt · Morgan SHORT gate ≥ 65 ·
-Force close 16:20 UTC. **No phantom logging** (this system never STAY-OUTs on entry).
+Stop 10pt · Target 25pt · Spread 3pt · Stake £2/pt · fully bidirectional (no SHORT gate) ·
+three-zone Morgan (exit posture only) · Force close 16:20 UTC. **No phantom logging**
+(this system never STAY-OUTs on entry).
 
 ## Running
 ```
