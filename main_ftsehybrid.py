@@ -492,16 +492,6 @@ def run_candle_tick(
         _push_flat()
         return
 
-    # Morgan SHORT gate -- SHORT entries require Morgan confidence >= 65.
-    if ssl_dir == "SHORT":
-        _morgan = get_perf_dashboard_dict().get("confidence_score")
-        if _morgan is None:
-            _morgan = 50
-        if _morgan < 65:
-            log.info("SHORT entry blocked -- Morgan confidence below 65 (current: %s)", _morgan)
-            _push_flat()
-            return
-
     # Calendar look-ahead -- HARD BLOCK a new entry if a major event is within 60 min.
     if _major_event_within(now_utc, 60):
         log.info("Entry blocked -- major calendar event within 60 min")
