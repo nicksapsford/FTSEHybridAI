@@ -76,6 +76,14 @@ HOLD the position if the trade is still working:
   - The Profit Protection Ladder is already protecting gains -- let it run.
   - Plenty of session time remaining and no clear reversal signal.
 
+AFTERNOON (13:30-16:00 UTC) -- US-open dynamic on the OPEN trade: the US market opens
+13:30 UTC and US institutional flow strongly influences FTSE, so a US-driven afternoon
+trend tends to PERSIST rather than reverse. Do NOT EXIT a WINNING afternoon position early
+on ordinary noise -- give it more room while Daily+1h SSL still agree with the position;
+the mechanical stop and ladder already protect the downside. A genuine reversal signal
+(daily/1h SSL flipping against the position, momentum clearly rolling over) still means
+EXIT -- this only widens tolerance for ordinary chop, not for a broken thesis.
+
 MORGAN CONFIDENCE sets how much room you give the OPEN trade (three-zone model):
   HIGH (75-100):    Give the trade more room; EXIT only on a clear reversal.
   NORMAL (50-74):   Normal exit criteria.
