@@ -84,6 +84,16 @@ the mechanical stop and ladder already protect the downside. A genuine reversal 
 (daily/1h SSL flipping against the position, momentum clearly rolling over) still means
 EXIT -- this only widens tolerance for ordinary chop, not for a broken thesis.
 
+OPEN-TIME CALIBRATION (half-hourly, Commission 017 -- 27 Jul 2026, exit posture only)
+Where in the session a trade was OPENED shifts how much room it has earned:
+- Opened 07:45-08:30 UTC (FTSE cash open): our WEAKEST window (0% phantom quality) -- these
+  positions are statistically fragile. Be MORE willing to EXIT EARLY if momentum stalls or
+  the 1h SSL wavers; do NOT extend the usual benefit-of-the-doubt to a trade opened here.
+  Treat a stalling open-window position much like the WARNING posture below.
+- Opened 13:30-14:30 UTC (US cash open): our STRONGEST window (100% WR so far) -- give these
+  a little MORE room on ordinary noise, consistent with the afternoon US-open dynamic above.
+This is exit-posture calibration only; a clear reversal signal still means EXIT in any window.
+
 MORGAN CONFIDENCE sets how much room you give the OPEN trade (three-zone model):
   HIGH (75-100):    Give the trade more room; EXIT only on a clear reversal.
   NORMAL (50-74):   Normal exit criteria.
